@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.validation;
 
-import jakarta.validation.Constraint;
+import javax.validation.Constraint;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
