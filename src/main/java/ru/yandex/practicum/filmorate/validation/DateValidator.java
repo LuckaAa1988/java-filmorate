@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateValidator implements ConstraintValidator<AfterDate, LocalDate> {
     private String validDate;
+    private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public void initialize(AfterDate constraintAnnotation) {
@@ -16,7 +17,6 @@ public class DateValidator implements ConstraintValidator<AfterDate, LocalDate> 
 
     @Override
     public boolean isValid(LocalDate date, ConstraintValidatorContext constraintValidatorContext) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.isAfter(LocalDate.parse(validDate,dateTimeFormatter));
     }
 }

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@EqualsAndHashCode(exclude = "id")
+@EqualsAndHashCode
 public class User {
     private int id;
     private String name;

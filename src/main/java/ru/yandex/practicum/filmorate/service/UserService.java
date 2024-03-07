@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exceptions.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,7 +15,7 @@ public class UserService {
     private int id = 1;
 
     public User create(User user) throws AlreadyExistException {
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (!StringUtils.hasText(user.getName())) {
             user.setName(user.getLogin());
         }
         if (!users.contains(user)) {

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@EqualsAndHashCode(exclude = "id")
+@EqualsAndHashCode
 public class Film {
     private int id;
     @NotNull
