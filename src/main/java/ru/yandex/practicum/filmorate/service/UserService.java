@@ -1,46 +1,92 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exceptions.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    private final List<User> users = new ArrayList<>();
-    private int id = 1;
+
+    private final UserStorage userStorage;
 
     public User create(User user) throws AlreadyExistException {
-        if (!StringUtils.hasText(user.getName())) {
-            user.setName(user.getLogin());
-        }
-        if (!users.contains(user)) {
-            user.setId(id++);
-            users.add(user);
-            return user;
-        }
-        throw  new AlreadyExistException("User already exist");
+        return userStorage.create(user);
     }
 
     public User update(User user) throws NotFoundException {
-        return users.stream()
-                .filter(u -> u.getId() == user.getId())
-                .map(u -> {
-                    u.setName(user.getName());
-                    u.setLogin(user.getLogin());
-                    u.setEmail(user.getEmail());
-                    u.setBirthday(user.getBirthday());
-                    return u;
-                })
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        return userStorage.update(user);
     }
 
     public List<User> getAll() {
-        return users;
+        return userStorage.getAll();
+    }
+
+    public User addFriend(Long userId, Long friendId) throws NotFoundException {
+        Optional<User> user = userStorage.findById(userId);
+        Optional<User> friend = userStorage.findById(friendId);
+        if (user.isPresent() && friend.isPresent()) {
+            if (user.get().getFriends() == null) {
+                user.get().setFriends(new HashSet<>());
+            }
+            if (friend.get().getFriends() == null) {
+                friend.get().setFriends(new HashSet<>());
+            }
+            user.get().getFriends().add(friendId);
+            friend.get().getFriends().add(userId);
+            return user.get();
+        } else throw new NotFoundException("User with id: "+userId+" not found");
+    }
+
+    public User removeFriend(Long userId, Long friendId) throws NotFoundException {
+        Optional<User> user = userStorage.findById(userId);
+        Optional<User> friend = userStorage.findById(friendId);
+        if (user.isPresent() && friend.isPresent()) {
+            if (user.get().getFriends() == null) {
+                user.get().setFriends(new HashSet<>());
+            }
+            if (friend.get().getFriends() == null) {
+                friend.get().setFriends(new HashSet<>());
+            }
+            user.get().getFriends().remove(friendId);
+            friend.get().getFriends().remove(userId);
+            return user.get();
+        } else throw new NotFoundException("User with id: "+userId+" not found");
+    }
+
+    public List<User> getAllFriends(Long userId) throws NotFoundException {
+        Optional<User> user = userStorage.findById(userId);
+        List<User> friends = new ArrayList<>();
+        if (user.isPresent() && user.get().getFriends() != null) {
+            for (Long id : user.get().getFriends()) {
+                friends.add(userStorage.findById(id).get());
+            }
+            return friends;
+        } else throw new NotFoundException("User with id: "+userId+" not found");
+    }
+
+    public List<User> getAllCommonFriends(Long userId, Long otherId) throws NotFoundException {
+        Optional<User> user = userStorage.findById(userId);
+        Optional<User> other = userStorage.findById(otherId);
+        List<User> commonFriends = new ArrayList<>();
+        if (user.isPresent() && other.isPresent()) {
+            commonFriends.addAll(getAllFriends(userId));
+            commonFriends.addAll(getAllFriends(otherId));
+            Map<User, Long> map = commonFriends.stream()
+                    .collect(Collectors.groupingBy(n -> n, Collectors.counting()));
+            return map.entrySet().stream().filter(c -> c.getValue() > 1)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        } else throw new NotFoundException("User with id: "+userId+" not found");
+    }
+
+    public Optional<User> findById(Long userId) {
+        return userStorage.findById(userId);
     }
 }

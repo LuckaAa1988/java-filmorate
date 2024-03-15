@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,9 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -33,5 +34,27 @@ public class FilmController {
     @GetMapping
     public ResponseEntity<List<Film>> getAll() {
         return ResponseEntity.ok(filmService.getAll());
+    }
+
+    @GetMapping(value = "/{filmId}")
+    public Optional<Film> findById(@PathVariable Long filmId) {
+        return filmService.findById(filmId);
+    }
+
+    @PutMapping(value = "/{filmId}/like/{userId}")
+    public ResponseEntity<Film> addLike(@PathVariable Long filmId,
+                                        @PathVariable Long userId) throws NotFoundException {
+        return ResponseEntity.ok(filmService.addLike(filmId, userId));
+    }
+
+    @DeleteMapping(value = "/{filmId}/like/{userId}")
+    public ResponseEntity<Film> removeLike(@PathVariable Long filmId,
+                                           @PathVariable Long userId) throws NotFoundException {
+        return ResponseEntity.ok(filmService.removeLike(filmId, userId));
+    }
+
+    @GetMapping(value = "/popular")
+    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        return ResponseEntity.ok(filmService.getPopularFilms(count));
     }
 }
