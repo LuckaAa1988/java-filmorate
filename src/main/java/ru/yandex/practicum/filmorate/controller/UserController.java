@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +9,9 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -45,13 +44,13 @@ public class UserController {
     @PutMapping(value = "/{userId}/friends/{friendId}")
     public ResponseEntity<User> addFriend(@PathVariable Long userId,
                                           @PathVariable Long friendId) throws NotFoundException {
-        return ResponseEntity.ok(userService.addFriend(userId,friendId));
+        return ResponseEntity.ok(userService.addFriend(userId, friendId));
     }
 
     @DeleteMapping(value = "/{userId}/friends/{friendId}")
     public ResponseEntity<User> removeFriend(@PathVariable Long userId,
                                              @PathVariable Long friendId) throws NotFoundException {
-        return ResponseEntity.ok(userService.removeFriend(userId,friendId));
+        return ResponseEntity.ok(userService.removeFriend(userId, friendId));
     }
 
     @GetMapping(value = "/{userId}/friends")
@@ -62,7 +61,7 @@ public class UserController {
     @GetMapping(value = "/{userId}/friends/common/{otherId}")
     public ResponseEntity<List<User>> getAllCommonFriends(@PathVariable Long userId,
                                                           @PathVariable Long otherId) throws NotFoundException {
-        return ResponseEntity.ok(userService.getAllCommonFriends(userId,otherId));
+        return ResponseEntity.ok(userService.getAllCommonFriends(userId, otherId));
     }
 
 }
