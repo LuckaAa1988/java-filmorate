@@ -38,7 +38,7 @@ public class FilmService {
             }
             film.get().getLikes().add(userId);
             return film.get();
-        } else throw new NotFoundException("Film with id: "+filmId+" not Found");
+        } else throw new NotFoundException("Film with id: " + filmId + " not Found");
     }
 
     public Film removeLike(Long filmId, Long userId) throws NotFoundException {
@@ -49,7 +49,7 @@ public class FilmService {
             }
             film.get().getLikes().remove(userId);
             return film.get();
-        } else throw new NotFoundException("Film with id: "+filmId+" not Found");
+        } else throw new NotFoundException("Film with id: " + filmId + " not Found");
     }
 
     public List<Film> getPopularFilms(int count) {

@@ -41,7 +41,7 @@ public class UserService {
             user.get().getFriends().add(friendId);
             friend.get().getFriends().add(userId);
             return user.get();
-        } else throw new NotFoundException("User with id: "+userId+" not found");
+        } else throw new NotFoundException("User with id: " + userId + " not found");
     }
 
     public User removeFriend(Long userId, Long friendId) throws NotFoundException {
@@ -57,7 +57,7 @@ public class UserService {
             user.get().getFriends().remove(friendId);
             friend.get().getFriends().remove(userId);
             return user.get();
-        } else throw new NotFoundException("User with id: "+userId+" not found");
+        } else throw new NotFoundException("User with id: " + userId + " not found");
     }
 
     public List<User> getAllFriends(Long userId) throws NotFoundException {
@@ -68,7 +68,7 @@ public class UserService {
                 friends.add(userStorage.findById(id).get());
             }
             return friends;
-        } else throw new NotFoundException("User with id: "+userId+" not found");
+        } else throw new NotFoundException("User with id: " + userId + " not found");
     }
 
     public List<User> getAllCommonFriends(Long userId, Long otherId) throws NotFoundException {
@@ -83,7 +83,7 @@ public class UserService {
             return map.entrySet().stream().filter(c -> c.getValue() > 1)
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
-        } else throw new NotFoundException("User with id: "+userId+" not found");
+        } else throw new NotFoundException("User with id: " + userId + " not found");
     }
 
     public Optional<User> findById(Long userId) {
