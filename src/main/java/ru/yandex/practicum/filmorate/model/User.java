@@ -8,13 +8,15 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validation.NoSpaces;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public class User {
-    private int id;
+    private Long id;
     private String name;
     @Email
     private String email;
@@ -25,4 +27,5 @@ public class User {
     @Past
     @NotNull
     private LocalDate birthday;
+    private Set<Long> friends = new HashSet<>();
 }
