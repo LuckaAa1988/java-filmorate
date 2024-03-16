@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserStorage {
     User create(User user) throws AlreadyExistException;
@@ -17,4 +18,8 @@ public interface UserStorage {
     boolean delete(User user);
 
     Optional<User> findById(Long id);
+
+    List<User> findByIds(Set<Long> id);
+
+    List<User> getAllCommonFriends(User user, User otherUser);
 }

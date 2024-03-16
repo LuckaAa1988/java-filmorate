@@ -18,4 +18,6 @@ public interface FilmStorage {
     boolean delete(Film film);
 
     Optional<Film> findById(Long id);
+
+    List<Film> getPopularFilms(int count);
 }

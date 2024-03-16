@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -49,6 +50,17 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.stream()
                 .filter(f -> f.getId().equals(id))
                 .findFirst();
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        if (count > films.size()) {
+            count = films.size();
+        }
+        return films.stream()
+                .sorted((f1, f2) -> f2.getLikes().size() - f1.getLikes().size())
+                .collect(Collectors.toList())
+                .subList(0, count);
     }
 
     @Override

@@ -31,39 +31,33 @@ public class FilmService {
     }
 
     public Film addLike(Long filmId, Long userId) throws NotFoundException {
-        Optional<Film> film = filmStorage.findById(filmId);
-        if (film.isPresent()) {
-            if (film.get().getLikes() == null) {
-                film.get().setLikes(new HashSet<>());
+        Optional<Film> filmOptional = filmStorage.findById(filmId);
+        filmOptional.ifPresent(film -> {
+            if (film.getLikes() == null) {
+                film.setLikes(new HashSet<>());
             }
-            film.get().getLikes().add(userId);
-            return film.get();
-        } else throw new NotFoundException("Film with id: " + filmId + " not Found");
+            film.getLikes().add(userId);
+        });
+        return filmOptional.orElseThrow(() -> new NotFoundException("Film with id: " + filmId + " not Found"));
     }
 
     public Film removeLike(Long filmId, Long userId) throws NotFoundException {
-        Optional<Film> film = filmStorage.findById(filmId);
-        if (film.isPresent()) {
-            if (film.get().getLikes() == null) {
-                film.get().setLikes(new HashSet<>());
+        Optional<Film> filmOptional = filmStorage.findById(filmId);
+        filmOptional.ifPresent(film -> {
+            if (film.getLikes() == null) {
+                film.setLikes(new HashSet<>());
             }
-            film.get().getLikes().remove(userId);
-            return film.get();
-        } else throw new NotFoundException("Film with id: " + filmId + " not Found");
+            film.getLikes().remove(userId);
+        });
+        return filmOptional.orElseThrow(() -> new NotFoundException("Film with id: " + filmId + " not Found"));
     }
 
     public List<Film> getPopularFilms(int count) {
-        List<Film> popularFilms = filmStorage.getAll();
-        if (count > popularFilms.size()) {
-            count = popularFilms.size();
-        }
-        return popularFilms.stream()
-                .sorted((f1, f2) -> f2.getLikes().size() - f1.getLikes().size())
-                .collect(Collectors.toList())
-                .subList(0, count);
+        return filmStorage.getPopularFilms(count);
     }
 
-    public Optional<Film> findById(Long filmId) {
-        return filmStorage.findById(filmId);
+    public Film findById(Long filmId) throws NotFoundException {
+        return filmStorage.findById(filmId).orElseThrow(
+                () -> new NotFoundException("Film with id: " + filmId + " not Found"));
     }
 }

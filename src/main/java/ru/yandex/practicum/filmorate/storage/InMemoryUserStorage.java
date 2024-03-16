@@ -6,9 +6,8 @@ import ru.yandex.practicum.filmorate.exceptions.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -54,6 +53,25 @@ public class InMemoryUserStorage implements UserStorage {
         return users.stream()
                 .filter(u -> u.getId().equals(friendId))
                 .findFirst();
+    }
+
+    @Override
+    public List<User> findByIds(Set<Long> friends) {
+        return friends.stream()
+                .flatMap(f -> users.stream()
+                        .filter(u -> u.getId().equals(f)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getAllCommonFriends(User user, User otherUser) {
+        List<User> commonFriends = new ArrayList<>(findByIds(user.getFriends()));
+        commonFriends.addAll(findByIds(otherUser.getFriends()));
+        return commonFriends.stream()
+                .collect(Collectors.groupingBy(n -> n, Collectors.counting())).entrySet().stream()
+                .filter(c -> c.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     @Override

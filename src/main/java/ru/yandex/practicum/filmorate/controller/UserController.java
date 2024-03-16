@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}")
-    public Optional<User> findById(@PathVariable Long userId) {
+    public User findById(@PathVariable Long userId) throws NotFoundException {
         return userService.findById(userId);
     }
 
