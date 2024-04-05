@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.UserDAO;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component("userDAOImpl")
@@ -37,6 +36,12 @@ public class UserDAOImpl implements UserDAO {
                                                      "WHERE user_id = ? AND friend_id = ?";
     private static final String ADD_FRIEND_SQL = "INSERT INTO friends (user_id, friend_id, is_friend) VALUES (?,?,?)";
     private static final String REMOVE_FRIEND_SQL = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
+    private static final String GET_ALL_COMMON_FRIENDS_SQL = "SELECT u.id, u.name, u.email, u.login," +
+                                                             " u.birthday FROM friends as f\n" +
+                                                             "JOIN users as u ON f.friend_id = u.id\n" +
+                                                             "WHERE (user_id = ? OR user_id = ?) \n" +
+                                                             "GROUP BY f.friend_id\n" +
+                                                             "HAVING (COUNT(f.friend_id) > 1)";
 
     @Override
     public User create(User user) throws AlreadyExistException {
@@ -74,8 +79,7 @@ public class UserDAOImpl implements UserDAO {
                 .email(rs.getString("email"))
                 .login(rs.getString("login"))
                 .birthday(rs.getDate("birthday").toLocalDate())
-                .friends(jdbcTemplate.query(SELECT_FRIENDS_SQL,
-                        (rs1, rowNum1) -> rs1.getLong("friend_id"), rs.getLong("id")))
+                .friends(getIdFriendsById(rs.getLong("id")))
                 .build());
     }
 
@@ -92,8 +96,7 @@ public class UserDAOImpl implements UserDAO {
                         .email(rs.getString("email"))
                         .login(rs.getString("login"))
                         .birthday(rs.getDate("birthday").toLocalDate())
-                        .friends(jdbcTemplate.query(SELECT_FRIENDS_SQL,
-                                (rs1, rowNum1) -> rs1.getLong("friend_id"), id))
+                        .friends(getIdFriendsById(id))
                         .build(), id)
                 .stream()
                 .findFirst();
@@ -101,8 +104,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public List<User> findByIds(User user) {
-        List<Long> friendList = jdbcTemplate.query(SELECT_FRIENDS_SQL,
-                (rs1, rowNum1) -> rs1.getLong("friend_id"), user.getId());
+        List<Long> friendList = getIdFriendsById(user.getId());
         List<User> userList = new ArrayList<>();
         for (Long id : friendList) {
             userList.add(findById(id).get());
@@ -112,22 +114,14 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public List<User> getAllCommonFriends(User user, User otherUser) {
-        List<Long> commonFriends = new ArrayList<>(
-                jdbcTemplate.query(SELECT_FRIENDS_SQL,
-                        (rs, rowNum) -> rs.getLong("friend_id"), user.getId()));
-        commonFriends.addAll(
-                jdbcTemplate.query(SELECT_FRIENDS_SQL,
-                        (rs, rowNum) -> rs.getLong("friend_id"), otherUser.getId()));
-        List<Long> result = commonFriends.stream()
-                .collect(Collectors.groupingBy(n -> n, Collectors.counting())).entrySet().stream()
-                .filter(c -> c.getValue() > 1)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-        List<User> userList = new ArrayList<>();
-        for (Long id : result) {
-            userList.add(findById(id).get());
-        }
-        return userList;
+        return jdbcTemplate.query(GET_ALL_COMMON_FRIENDS_SQL, (rs, rowNum) -> User.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .email(rs.getString("email"))
+                .login(rs.getString("login"))
+                .birthday(rs.getDate("birthday").toLocalDate())
+                .friends(getIdFriendsById(rs.getLong("id")))
+                .build(), user.getId(), otherUser.getId());
     }
 
     public User addFriend(Long userId, Long friendId) throws NotFoundException {
@@ -137,7 +131,7 @@ public class UserDAOImpl implements UserDAO {
                 () -> new NotFoundException("User with id: " + friendId + " not found"));
         boolean isFriend = false;
 
-        List<Long> friendList = jdbcTemplate.query(SELECT_FRIENDS_SQL, (rs, rowNum) -> rs.getLong("friend_id"), friendId);
+        List<Long> friendList = getIdFriendsById(friendId);
 
         if (friendList.contains(userId)) {
             jdbcTemplate.update(UPDATE_FRIENDS_SQL,
@@ -155,5 +149,9 @@ public class UserDAOImpl implements UserDAO {
         User friend = findById(friendId).orElseThrow(
                 () -> new NotFoundException("User with id: " + friendId + " not found"));
         return jdbcTemplate.update(REMOVE_FRIEND_SQL, userId, friendId) > 0;
+    }
+
+    private List<Long> getIdFriendsById(Long id) {
+        return jdbcTemplate.query(SELECT_FRIENDS_SQL, (rs, rowNum) -> rs.getLong("friend_id"), id);
     }
 }

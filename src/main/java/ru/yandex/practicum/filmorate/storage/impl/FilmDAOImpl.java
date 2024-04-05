@@ -113,8 +113,7 @@ public class FilmDAOImpl implements FilmDAO {
                         .id(rs.getLong("mpa_id"))
                         .name(rs.getString(7))
                         .build())
-                .likes(jdbcTemplate.query(GET_FILM_LIKES_SQL,
-                        (rs1, rowNum1) -> rs1.getLong("user_id"), rs.getLong("id")))
+                .likes(getFilmLikes(rs.getLong("id")))
                 .build());
     }
 
@@ -136,8 +135,7 @@ public class FilmDAOImpl implements FilmDAO {
                         .id(rs.getLong(6))
                         .name(rs.getString(7))
                         .build())
-                .likes(jdbcTemplate.query(GET_FILM_LIKES_SQL,
-                        (rs1, rowNum1) -> rs1.getLong("user_id"), rs.getLong("id")))
+                .likes(getFilmLikes(rs.getLong("id")))
                 .build(), id).stream().findFirst();
     }
 
@@ -167,5 +165,9 @@ public class FilmDAOImpl implements FilmDAO {
     public Film removeLike(Long filmId, Long userId) throws NotFoundException {
         jdbcTemplate.update(REMOVE_LIKE_SQL, filmId, userId);
         return findById(filmId).orElseThrow(() -> new NotFoundException("Film with id: " + filmId + " not Found"));
+    }
+
+    private List<Long> getFilmLikes(Long id) {
+        return jdbcTemplate.query(GET_FILM_LIKES_SQL, (rs, rowNum) -> rs.getLong("user_id"), id);
     }
 }

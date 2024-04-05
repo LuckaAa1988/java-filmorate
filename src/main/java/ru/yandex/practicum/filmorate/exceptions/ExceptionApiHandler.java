@@ -16,35 +16,30 @@ public class ExceptionApiHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorMessage notFoundException(NotFoundException exception) {
-        log.info(exception.getMessage());
         return new ErrorMessage(exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage notValidException(MethodArgumentNotValidException exception) {
-        log.info(exception.getMessage());
         return new ErrorMessage(exception.getMessage());
     }
 
     @ExceptionHandler(AlreadyExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage alreadyExistException(AlreadyExistException exception) {
-        log.info(exception.getMessage());
         return new ErrorMessage(exception.getMessage());
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage duplicateKeyException(DuplicateKeyException exception) {
-        log.info(exception.getMessage());
         return new ErrorMessage(exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage dataIntegrityViolationException(DataIntegrityViolationException exception) {
-        log.info(exception.getMessage());
         return new ErrorMessage(exception.getMessage());
     }
 }
