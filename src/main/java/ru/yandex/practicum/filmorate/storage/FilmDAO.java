@@ -7,9 +7,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 import java.util.Optional;
 
-public interface FilmStorage {
+public interface FilmDAO {
 
-    Film create(Film film) throws AlreadyExistException;
+    Film create(Film film) throws AlreadyExistException, NotFoundException;
 
     Film update(Film film) throws NotFoundException;
 
@@ -20,4 +20,8 @@ public interface FilmStorage {
     Optional<Film> findById(Long id);
 
     List<Film> getPopularFilms(int count);
+
+    Film addLike(Long filmId, Long userId) throws NotFoundException;
+
+    Film removeLike(Long filmId, Long userId) throws NotFoundException;
 }

@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,7 +29,21 @@ public class ExceptionApiHandler {
 
     @ExceptionHandler(AlreadyExistException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessage notValidException(AlreadyExistException exception) {
+    public ErrorMessage alreadyExistException(AlreadyExistException exception) {
+        log.info(exception.getMessage());
+        return new ErrorMessage(exception.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage duplicateKeyException(DuplicateKeyException exception) {
+        log.info(exception.getMessage());
+        return new ErrorMessage(exception.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorMessage dataIntegrityViolationException(DataIntegrityViolationException exception) {
         log.info(exception.getMessage());
         return new ErrorMessage(exception.getMessage());
     }

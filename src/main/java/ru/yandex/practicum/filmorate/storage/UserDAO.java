@@ -6,9 +6,8 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-public interface UserStorage {
+public interface UserDAO {
     User create(User user) throws AlreadyExistException;
 
     User update(User user) throws NotFoundException;
@@ -19,7 +18,11 @@ public interface UserStorage {
 
     Optional<User> findById(Long id);
 
-    List<User> findByIds(Set<Long> id);
+    List<User> findByIds(User user);
 
     List<User> getAllCommonFriends(User user, User otherUser);
+
+    User addFriend(Long userId, Long friendId) throws NotFoundException;
+
+    boolean removeFriend(Long userId, Long friendId) throws NotFoundException;
 }

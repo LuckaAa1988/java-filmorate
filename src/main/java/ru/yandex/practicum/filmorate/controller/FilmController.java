@@ -21,7 +21,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @PostMapping
-    public ResponseEntity<Film> create(@Valid @RequestBody Film film) throws AlreadyExistException {
+    public ResponseEntity<Film> create(@Valid @RequestBody Film film) throws AlreadyExistException, NotFoundException {
         return ResponseEntity.ok(filmService.create(film));
     }
 
