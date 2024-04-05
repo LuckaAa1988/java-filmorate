@@ -27,62 +27,35 @@ public class FilmDAOImpl implements FilmDAO {
     private final JdbcTemplate jdbcTemplate;
     private final MPADAO mpadao;
     private final GenreDAO genreDAO;
-    private static final String INSERT_FILM_SQL = """
-                INSERT INTO films (name, description, duration, release_date, mpa_id)
-                VALUES (?,?,?,?,?)
-                """;
-    private static final String INSERT_FILM_GENRES_SQL = """
-                INSERT INTO genre_films (film_id, genre_id)
-                VALUES (?,?)
-                """;
-    private static final String UPDATE_FILM_SQL = """
-                UPDATE films
-                SET name = ?, description = ?, duration = ?, release_date = ?, mpa_id = ?
-                WHERE id = ?
-                """;
-    private static final String GET_ALL_FILMS_SQL = """
-                SELECT f.id, f.name, f.description, f.duration, f.release_date, f.mpa_id, m.name
-                FROM films AS f
-                JOIN mpa as m ON f.mpa_id = m.id
-                """;
-    private static final String GET_FILM_LIKES_SQL = """
-                        SELECT user_id FROM films_likes
-                        WHERE film_id = ?
-                        """;
-    private static final String DELETE_FILM_SQL = """
-                DELETE FROM films
-                WHERE id = ?
-                """;
-    private static final String FIND_BY_ID_SQL = """
-                SELECT f.id, f.name, f.description, f.duration, f.release_date, f.mpa_id, m.name
-                FROM films AS f
-                JOIN mpa as m ON f.mpa_id = m.id
-                WHERE f.id = ?
-                """;
-    private static final String GET_POPULAR_FILMS_SQL = """
-                SELECT fl.film_id,
-                       COUNT(fl.user_id) AS likes,
-                       f.name,
-                       f.description,
-                       f.duration,
-                       f.release_date,
-                       f.mpa_id,
-                       m.name
-                FROM films_likes AS fl
-                JOIN films as f ON fl.film_id = f.id
-                JOIN mpa as m ON f.mpa_id= m.id
-                GROUP BY fl.film_id
-                ORDER BY likes DESC
-                LIMIT ?
-                """;
-    private static final String ADD_LIKE_SQL = """
-                INSERT INTO films_likes (film_id, user_id)
-                VALUES (?,?)
-                """;
-    private static final String REMOVE_LIKE_SQL = """
-                DELETE FROM films_likes
-                WHERE film_id = ? AND user_id = ?
-                """;
+    private static final String INSERT_FILM_SQL = "INSERT INTO films " +
+                                                  "(name, description, duration, release_date, mpa_id) " +
+                                                  "VALUES (?,?,?,?,?)";
+    private static final String INSERT_FILM_GENRES_SQL = "INSERT INTO genre_films (film_id, genre_id) VALUES (?,?)";
+    private static final String UPDATE_FILM_SQL = "UPDATE films " +
+                                                  "SET name = ?, description = ?, " +
+                                                  "duration = ?, release_date = ?, mpa_id = ? " +
+                                                  "WHERE id = ?";
+    private static final String GET_ALL_FILMS_SQL = "SELECT f.id, f.name, f.description, " +
+                                                    "f.duration, f.release_date, f.mpa_id, m.name " +
+                                                    "FROM films AS f " +
+                                                    "JOIN mpa as m ON f.mpa_id = m.id";
+    private static final String GET_FILM_LIKES_SQL = "SELECT user_id FROM films_likes WHERE film_id = ?";
+    private static final String DELETE_FILM_SQL = "DELETE FROM films WHERE id = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT f.id, f.name, f.description, f.duration, " +
+                                                 "f.release_date, f.mpa_id, m.name " +
+                                                 "FROM films AS f JOIN mpa as m ON f.mpa_id = m.id " +
+                                                 "WHERE f.id = ?";
+    private static final String GET_POPULAR_FILMS_SQL = "SELECT fl.film_id, COUNT(fl.user_id) AS likes, " +
+                                                        "f.name, f.description, f.duration, f.release_date, " +
+                                                        "f.mpa_id, m.name " +
+                                                        "FROM films_likes AS fl " +
+                                                        "JOIN films as f ON fl.film_id = f.id " +
+                                                        "JOIN mpa as m ON f.mpa_id= m.id " +
+                                                        "GROUP BY fl.film_id " +
+                                                        "ORDER BY likes DESC " +
+                                                        "LIMIT ?";
+    private static final String ADD_LIKE_SQL = "INSERT INTO films_likes (film_id, user_id) VALUES (?,?)";
+    private static final String REMOVE_LIKE_SQL = "DELETE FROM films_likes WHERE film_id = ? AND user_id = ?";
 
     @Override
     public Film create(Film film) throws AlreadyExistException, NotFoundException {

@@ -14,14 +14,8 @@ import java.util.Optional;
 public class MPADAOImpl implements MPADAO {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String GET_ALL_MPA_SQL = """
-                SELECT id, name FROM mpa
-                ORDER BY id
-                """;
-    private static final String FIND_BY_ID_SQL = """
-                SELECT id, name FROM mpa
-                WHERE id = ?
-                """;
+    private static final String GET_ALL_MPA_SQL = "SELECT id, name FROM mpa ORDER BY id";
+    private static final String FIND_BY_ID_SQL = "SELECT id, name FROM mpa WHERE id = ?";
 
     @Override
     public List<MPA> getAll() {

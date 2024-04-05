@@ -14,19 +14,12 @@ import java.util.Optional;
 public class GenreDAOImpl implements GenreDAO {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String GET_ALL_GENRES_SQL = """
-                SELECT id, name FROM genre
-                ORDER BY id
-                """;
-    private static final String FIND_BY_ID_SQL = """
-                SELECT id, name FROM genre
-                WHERE id = ?
-                """;
-    private static final String FIND_GENRES_BY_FILM_SQL = """
-                SELECT gf.genre_id, g.name FROM genre_films gf
-                JOIN genre AS g ON gf.genre_id = g.id
-                WHERE gf.film_id = ?
-                """;
+    private static final String GET_ALL_GENRES_SQL = "SELECT id, name FROM genre ORDER BY id";
+    private static final String FIND_BY_ID_SQL = "SELECT id, name FROM genre WHERE id = ?";
+    private static final String FIND_GENRES_BY_FILM_SQL = "SELECT gf.genre_id, g.name " +
+                                                          "FROM genre_films gf " +
+                                                          "JOIN genre AS g ON gf.genre_id = g.id " +
+                                                          "WHERE gf.film_id = ?";
 
     @Override
     public List<Genre> getAll() {

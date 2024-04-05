@@ -21,44 +21,22 @@ import java.util.stream.Collectors;
 public class UserDAOImpl implements UserDAO {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String INSERT_USER_SQL = """
-                INSERT INTO users (name, email, login, birthday)
-                VALUES (?,?,?,?)
-                """;
-    private static final String UPDATE_USER_SQL = """
-                UPDATE users SET name = ?, email = ?, login = ?, birthday = ?
-                WHERE id = ?
-                """;
-    private static final String GET_ALL_SQL = """
-                SELECT u.id, u.name, u.email, u.login, u.birthday FROM users AS u
-                ORDER BY u.id
-                """;
-    private static final String SELECT_FRIENDS_SQL = """
-            SELECT friend_id
-            FROM friends
-            WHERE user_id = ?
-            """;
-    private static final String DELETE_USERS_SQL = """
-                DELETE FROM users
-                WHERE id = ?
-                """;
-    private static final String FIND_BY_ID_SQL = """
-                SELECT u.id, u.name, u.email, u.login, u.birthday FROM users AS u
-                WHERE id = ?
-                ORDER BY id;
-                """;
-    private static final String UPDATE_FRIENDS_SQL = """
-            UPDATE friends SET is_friend = true
-            WHERE user_id = ? AND friend_id = ?
-            """;
-    private static final String ADD_FRIEND_SQL = """
-                INSERT INTO friends (user_id, friend_id, is_friend)
-                VALUES (?,?,?)
-                """;
-    private static final String REMOVE_FRIEND_SQL = """
-                DELETE FROM friends
-                WHERE user_id = ? AND friend_id = ?
-                """;
+    private static final String INSERT_USER_SQL = "INSERT INTO users (name, email, login, birthday) VALUES (?,?,?,?)";
+    private static final String UPDATE_USER_SQL = "UPDATE users SET name = ?, email = ?, login = ?, birthday = ? " +
+                                                  "WHERE id = ?";
+    private static final String GET_ALL_SQL = "SELECT u.id, u.name, u.email, u.login, u.birthday " +
+                                              "FROM users AS u " +
+                                              "ORDER BY u.id";
+    private static final String SELECT_FRIENDS_SQL = "SELECT friend_id FROM friends WHERE user_id = ?";
+    private static final String DELETE_USERS_SQL = "DELETE FROM users WHERE id = ?";
+    private static final String FIND_BY_ID_SQL = "SELECT u.id, u.name, u.email, u.login, u.birthday " +
+                                                 "FROM users AS u " +
+                                                 "WHERE id = ? " +
+                                                 "ORDER BY id;";
+    private static final String UPDATE_FRIENDS_SQL = "UPDATE friends SET is_friend = true " +
+                                                     "WHERE user_id = ? AND friend_id = ?";
+    private static final String ADD_FRIEND_SQL = "INSERT INTO friends (user_id, friend_id, is_friend) VALUES (?,?,?)";
+    private static final String REMOVE_FRIEND_SQL = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
 
     @Override
     public User create(User user) throws AlreadyExistException {
