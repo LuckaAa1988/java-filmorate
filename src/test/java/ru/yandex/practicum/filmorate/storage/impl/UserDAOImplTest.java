@@ -26,7 +26,6 @@ class UserDAOImplTest {
     @Test
     void testFindUserById() throws AlreadyExistException {
         User newUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -36,7 +35,9 @@ class UserDAOImplTest {
         UserDAOImpl userDAO = new UserDAOImpl(jdbcTemplate);
         userDAO.create(newUser);
 
-        User savedUser = userDAO.findById(1L).get();
+        Long userId = newUser.getId();
+
+        User savedUser = userDAO.findById(userId).get();
 
         assertThat(savedUser)
                 .isNotNull()
@@ -47,7 +48,6 @@ class UserDAOImplTest {
     @Test
     void testUpdateUser() throws AlreadyExistException, NotFoundException {
         User newUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -57,8 +57,10 @@ class UserDAOImplTest {
         UserDAOImpl userDAO = new UserDAOImpl(jdbcTemplate);
         userDAO.create(newUser);
 
+        Long userId = newUser.getId();
+
         User updatedUser = User.builder()
-                .id(1L)
+                .id(userId)
                 .name("Ivan Popov")
                 .email("user123@email.ru")
                 .login("Popov123")
@@ -68,7 +70,7 @@ class UserDAOImplTest {
 
         userDAO.update(updatedUser);
 
-        User savedUser = userDAO.findById(1L).get();
+        User savedUser = userDAO.findById(userId).get();
 
         assertThat(savedUser)
                 .isNotNull()
@@ -79,7 +81,6 @@ class UserDAOImplTest {
     @Test
     void testGetAllUsers() throws AlreadyExistException {
         User firstUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -87,7 +88,6 @@ class UserDAOImplTest {
                 .friends(new ArrayList<>())
                 .build();
         User secondUser = User.builder()
-                .id(2L)
                 .name("Ivan Popov")
                 .email("user123@email.ru")
                 .login("Popov123")
@@ -115,7 +115,6 @@ class UserDAOImplTest {
     @Test
     void testDeleteUser() throws AlreadyExistException {
         User newUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -125,9 +124,11 @@ class UserDAOImplTest {
         UserDAOImpl userDAO = new UserDAOImpl(jdbcTemplate);
         userDAO.create(newUser);
 
+        Long userId = newUser.getId();
+
         userDAO.delete(newUser);
 
-        Optional<User> savedUser = userDAO.findById(1L);
+        Optional<User> savedUser = userDAO.findById(userId);
 
         assertThat(savedUser)
                 .isEqualTo(Optional.empty());
@@ -138,11 +139,7 @@ class UserDAOImplTest {
         List<Long> friendListId1 = new ArrayList<>();
         List<Long> friendListId2 = new ArrayList<>();
 
-        friendListId1.add(2L);
-        friendListId2.add(1L);
-
         User firstUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -150,7 +147,6 @@ class UserDAOImplTest {
                 .friends(friendListId1)
                 .build();
         User secondUser = User.builder()
-                .id(2L)
                 .name("Ivan Popov")
                 .email("user123@email.ru")
                 .login("Popov123")
@@ -162,11 +158,17 @@ class UserDAOImplTest {
         userDAO.create(firstUser);
         userDAO.create(secondUser);
 
-        userDAO.addFriend(1L,2L);
-        userDAO.addFriend(2L,1L);
+        Long user1Id = firstUser.getId();
+        Long user2Id = secondUser.getId();
 
-        User savedFirstUser = userDAO.findById(1L).get();
-        User savedSecondUser = userDAO.findById(2L).get();
+        friendListId1.add(user2Id);
+        friendListId2.add(user1Id);
+
+        userDAO.addFriend(user1Id,user2Id);
+        userDAO.addFriend(user2Id,user1Id);
+
+        User savedFirstUser = userDAO.findById(user1Id).get();
+        User savedSecondUser = userDAO.findById(user2Id).get();
 
         assertAll(() -> {
             assertThat(savedFirstUser)

@@ -32,7 +32,6 @@ class FilmDAOImplTest {
     @Test
     void testFindFilmById() throws AlreadyExistException, NotFoundException {
         Film newFilm = Film.builder()
-                .id(1L)
                 .name("Test")
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1991, 2, 2))
@@ -44,10 +43,12 @@ class FilmDAOImplTest {
                 .build();
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(newFilm);
 
-        Film savedFilm = filmDAO.findById(1L).get();
+        Long id = newFilm.getId();
+
+        Film savedFilm = filmDAO.findById(id).get();
 
         assertThat(savedFilm)
                 .isNotNull()
@@ -58,7 +59,6 @@ class FilmDAOImplTest {
     @Test
     void testUpdateFilm() throws AlreadyExistException, NotFoundException {
         Film newFilm = Film.builder()
-                .id(1L)
                 .name("Test")
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1991, 2, 2))
@@ -71,11 +71,13 @@ class FilmDAOImplTest {
 
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(newFilm);
 
+        Long id = newFilm.getId();
+
         Film updatedFilm = Film.builder()
-                .id(1L)
+                .id(id)
                 .name("Updated Test")
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1990, 1, 1))
@@ -88,7 +90,7 @@ class FilmDAOImplTest {
 
         filmDAO.update(updatedFilm);
 
-        Film savedFilm = filmDAO.findById(1L).get();
+        Film savedFilm = filmDAO.findById(id).get();
 
         assertThat(savedFilm)
                 .isNotNull()
@@ -115,7 +117,7 @@ class FilmDAOImplTest {
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1990, 2, 2))
                 .mpa(MPA.builder()
-                        .id(1L)
+                        .id(2L)
                         .name("G")
                         .build())
                 .likes(new ArrayList<>())
@@ -126,7 +128,7 @@ class FilmDAOImplTest {
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1995, 2, 2))
                 .mpa(MPA.builder()
-                        .id(1L)
+                        .id(3L)
                         .name("G")
                         .build())
                 .likes(new ArrayList<>())
@@ -140,7 +142,7 @@ class FilmDAOImplTest {
 
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(film1);
         filmDAO.create(film2);
         filmDAO.create(film3);
@@ -156,7 +158,6 @@ class FilmDAOImplTest {
     @Test
     void testDeleteFilm() throws AlreadyExistException, NotFoundException {
         Film film1 = Film.builder()
-                .id(1L)
                 .name("Test1")
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1991, 2, 2))
@@ -168,12 +169,14 @@ class FilmDAOImplTest {
                 .build();
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(film1);
+
+        Long id = film1.getId();
 
         filmDAO.delete(film1);
 
-        Optional<Film> savedFilm = filmDAO.findById(1L);
+        Optional<Film> savedFilm = filmDAO.findById(id);
 
         assertThat(savedFilm)
                 .isEqualTo(Optional.empty());
@@ -182,7 +185,6 @@ class FilmDAOImplTest {
     @Test
     void testAddLikes() throws NotFoundException, AlreadyExistException {
         Film film1 = Film.builder()
-                .id(1L)
                 .name("Test1")
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1991, 2, 2))
@@ -194,10 +196,10 @@ class FilmDAOImplTest {
                 .build();
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(film1);
+        Long idFilm = film1.getId();
         User newUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -207,23 +209,24 @@ class FilmDAOImplTest {
         UserDAOImpl userDAO = new UserDAOImpl(jdbcTemplate);
         userDAO.create(newUser);
 
-        filmDAO.addLike(1L,1L);
+        Long userId = newUser.getId();
 
-        List<Long> friendList = new ArrayList<>();
-        friendList.add(1L);
+        filmDAO.addLike(idFilm, userId);
 
-        List<Long> savedFriendList = filmDAO.findById(1L).get().getLikes();
+        List<Long> likes = new ArrayList<>();
+        likes.add(userId);
+
+        List<Long> savedFriendList = filmDAO.findById(idFilm).get().getLikes();
 
         assertThat(savedFriendList)
                 .usingRecursiveComparison()
-                .isEqualTo(friendList);
+                .isEqualTo(likes);
     }
 
     @Test
     void testRemoveLikes() throws NotFoundException, AlreadyExistException {
         List<Long> friendList = new ArrayList<>();
         Film film1 = Film.builder()
-                .id(1L)
                 .name("Test1")
                 .description("Test desc")
                 .releaseDate(LocalDate.of(1991, 2, 2))
@@ -235,10 +238,10 @@ class FilmDAOImplTest {
                 .build();
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(film1);
+        Long filmId = film1.getId();
         User newUser = User.builder()
-                .id(1L)
                 .name("Ivan Petrov")
                 .email("user@email.ru")
                 .login("vanya123")
@@ -248,11 +251,13 @@ class FilmDAOImplTest {
         UserDAOImpl userDAO = new UserDAOImpl(jdbcTemplate);
         userDAO.create(newUser);
 
-        filmDAO.addLike(1L,1L);
+        Long userId = newUser.getId();
 
-        filmDAO.removeLike(1L,1L);
+        filmDAO.addLike(filmId, userId);
 
-        List<Long> savedFriendList = filmDAO.findById(1L).get().getLikes();
+        filmDAO.removeLike(filmId, userId);
+
+        List<Long> savedFriendList = filmDAO.findById(filmId).get().getLikes();
 
         assertThat(savedFriendList)
                 .usingRecursiveComparison()
@@ -301,7 +306,7 @@ class FilmDAOImplTest {
 
         MPADAO mpadao = new MPADAOImpl(jdbcTemplate);
         GenreDAO genreDAO = new GenreDAOImpl(jdbcTemplate);
-        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate,mpadao,genreDAO);
+        FilmDAO filmDAO = new FilmDAOImpl(jdbcTemplate, mpadao, genreDAO);
         filmDAO.create(film1);
         filmDAO.create(film2);
 
@@ -309,9 +314,9 @@ class FilmDAOImplTest {
         userDAO.create(firstUser);
         userDAO.create(secondUser);
 
-        filmDAO.addLike(2L,1L);
-        filmDAO.addLike(2L,2L);
-        filmDAO.addLike(1L,1L);
+        filmDAO.addLike(2L, 1L);
+        filmDAO.addLike(2L, 2L);
+        filmDAO.addLike(1L, 1L);
 
         List<Film> savedPopularFilms = filmDAO.getPopularFilms(3);
 
