@@ -8,13 +8,15 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validation.NoSpaces;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class User {
     private Long id;
     private String name;
@@ -27,5 +29,5 @@ public class User {
     @Past
     @NotNull
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
+    private List<Long> friends = new ArrayList<>();
 }

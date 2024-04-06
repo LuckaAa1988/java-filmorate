@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{userId}/friends/{friendId}")
-    public ResponseEntity<User> removeFriend(@PathVariable Long userId,
+    public ResponseEntity<Boolean> removeFriend(@PathVariable Long userId,
                                              @PathVariable Long friendId) throws NotFoundException {
         return ResponseEntity.ok(userService.removeFriend(userId, friendId));
     }

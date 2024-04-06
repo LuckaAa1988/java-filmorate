@@ -1,81 +1,58 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserDAO;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
+    private final UserDAO userDAO;
 
-    private final UserStorage userStorage;
+    public UserService(@Qualifier("userDAOImpl") UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
 
     public User create(User user) throws AlreadyExistException {
-        return userStorage.create(user);
+        return userDAO.create(user);
     }
 
     public User update(User user) throws NotFoundException {
-        return userStorage.update(user);
+        return userDAO.update(user);
     }
 
     public List<User> getAll() {
-        return userStorage.getAll();
+        return userDAO.getAll();
     }
 
     public User addFriend(Long userId, Long friendId) throws NotFoundException {
-        User user = userStorage.findById(userId).orElseThrow(
-                () -> new NotFoundException("User with id: " + userId + " not found"));
-        User friend = userStorage.findById(friendId).orElseThrow(
-                () -> new NotFoundException("User with id: " + friendId + " not found"));
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
-        if (friend.getFriends() == null) {
-            friend.setFriends(new HashSet<>());
-        }
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        return user;
+        return userDAO.addFriend(userId,friendId);
     }
 
-    public User removeFriend(Long userId, Long friendId) throws NotFoundException {
-        User user = userStorage.findById(userId).orElseThrow(
-                () -> new NotFoundException("User with id: " + userId + " not found"));
-        User friend = userStorage.findById(friendId).orElseThrow(
-                () -> new NotFoundException("User with id: " + friendId + " not found"));
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
-        if (friend.getFriends() == null) {
-            friend.setFriends(new HashSet<>());
-        }
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        return user;
+    public boolean removeFriend(Long userId, Long friendId) throws NotFoundException {
+        return userDAO.removeFriend(userId,friendId);
     }
 
     public List<User> getAllFriends(Long userId) throws NotFoundException {
-        User user = userStorage.findById(userId).orElseThrow(
+        User user = userDAO.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with id: " + userId + " not found"));
-        return userStorage.findByIds(user.getFriends());
+        return userDAO.findByIds(user);
     }
 
     public List<User> getAllCommonFriends(Long userId, Long otherId) throws NotFoundException {
-        User user = userStorage.findById(userId).orElseThrow(
+        User user = userDAO.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with id: " + userId + " not found"));
-        User other = userStorage.findById(otherId).orElseThrow(
+        User other = userDAO.findById(otherId).orElseThrow(
                 () -> new NotFoundException("User with id: " + userId + " not found"));
-        return userStorage.getAllCommonFriends(user, other);
+        return userDAO.getAllCommonFriends(user, other);
     }
 
     public User findById(Long userId) throws NotFoundException {
-        return userStorage.findById(userId).orElseThrow(
+        return userDAO.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with id: " + userId + " not found"));
     }
 }
